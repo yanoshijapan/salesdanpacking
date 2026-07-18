@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Packing</title>
-  <link rel="manifest" href="./manifest_packing.json">
+  <link rel="manifest" href="./manifest.json">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
 
@@ -111,6 +111,11 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbxSxXRkkVV793Ws2XivvLfdiw9u1zzsZkLPitM8hhcHmZ2ionKVYLB3HDgo3as4QKnQ9Q/exec"; 
     
     let localData = [];
+		
+		function formatTanggal(dateStr) {
+        if (!dateStr) return '-';
+        return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
 
     // Fungsi Fetch Data Biasa (Auto/Background)
     async function fetchData() {
@@ -179,7 +184,13 @@
       let data = [...localData];
       
       // Filter Data
-      if(fTgl) data = data.filter(d => d.tanggal === fTgl);
+      if(fTgl) {
+          data = data.filter(d => {
+              let dDate = new Date(d.tanggal);
+              let localDateStr = dDate.getFullYear() + "-" + String(dDate.getMonth() + 1).padStart(2, '0') + "-" + String(dDate.getDate()).padStart(2, '0');
+              return localDateStr === fTgl || d.tanggal === fTgl;
+          });
+      }
       if(fNama) data = data.filter(d => d.nama.toLowerCase().includes(fNama));
       if(fPack) data = data.filter(d => d.status_packing === fPack);
       if(fKirim !== "") data = data.filter(d => String(d.status_kirim) === fKirim);
@@ -198,7 +209,8 @@
             <div class="card-header">
               <div style="flex: 1;">
                 <div class="card-title">${item.nama}</div>
-                <div class="card-date">Tanggal: ${item.tanggal}</div>
+                <!-- UBAH TAMPILAN TANGGAL DI SINI -->
+                <div class="card-date">Tanggal: ${formatTanggal(item.tanggal)}</div> 
               </div>
               <span class="badge ${kirimClass}" style="margin-left: 10px;">Kirim: ${item.status_kirim ? 'Sudah Kirim' : 'Belum'}</span>
             </div>
