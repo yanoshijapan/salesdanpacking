@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Packing</title>
+  <link rel="manifest" href="./manifest_packing.json">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; overflow-wrap: break-word; word-wrap: break-word; }
+    body { background-color: #f8f9fa; color: #333; }
+
+    /* Loading Screen */
+    #loader {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(255, 255, 255, 0.9); z-index: 9999;
+      display: flex; justify-content: center; align-items: center;
+      transition: opacity 0.5s ease;
+    }
+    .spinner {
+      border: 5px solid #f3f3f3; border-top: 5px solid #d32f2f;
+      border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* Headers (Membeku) */
+    .sticky-header {
+      position: sticky; top: 0; z-index: 100;
+      background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      padding: 15px 20px; border-bottom: 3px solid #ffd700;
+    }
+    .header-top {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+    }
+    /* Mengubah warna judul menjadi merah */
+    .header-title { color: #d32f2f; font-weight: 700; margin: 0; }
+    
+    .filter-group { display: flex; gap: 10px; flex-wrap: wrap; }
+    input, select, button { padding: 10px; border-radius: 6px; border: 1px solid #ccc; outline: none; }
+    input { flex: 1; min-width: 150px; }
+    button { font-weight: 600; cursor: pointer; transition: 0.3s; border: none; }
+    
+    .btn-primary { background: #d32f2f; color: white; }
+    .btn-primary:hover { background: #b71c1c; }
+    .btn-gold { background: #ffd700; color: #333; display: flex; align-items: center; gap: 6px; }
+    .btn-gold:hover { background: #fbc02d; }
+    .btn-danger { background: #e53935; color: white; }
+    .btn-success { background: #43a047; color: white; }
+    .btn-outline { background: transparent; border: 1px solid #d32f2f; color: #d32f2f; }
+
+    /* Container & Cards */
+    .container { padding: 20px; max-width: 1000px; margin: 0 auto; }
+    .card {
+      background: white; padding: 15px; border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 15px;
+      border-left: 4px solid #ffd700;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .card-title { font-weight: 600; font-size: 1.1em; white-space: normal; }
+    .card-date { font-size: 0.8em; color: #777; }
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600; display: inline-block; }
+    .badge-waiting { background: #eee; color: #555; }
+    .badge-sent { background: #c8e6c9; color: #2e7d32; }
+    
+    .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 5px; }
+    .action-buttons button { flex: 1; }
+    .note-section { display: flex; gap: 10px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loader"><div class="spinner"></div></div>
+
+  <!-- Header Membeku -->
+  <div class="sticky-header">
+    <div class="header-top">
+      <!-- Judul Warna Merah -->
+      <h2 class="header-title">Packing</h2>
+      <!-- Tombol Refresh di Kanan Atas -->
+      <button class="btn-gold" onclick="manualRefresh()" style="padding: 8px 15px;">
+        <span style="font-size: 1.2em; line-height: 1;">&#x21bb;</span> Refresh
+      </button>
+    </div>
+
+    <div class="filter-group">
+      <input type="date" id="filterTanggal" onchange="renderData()">
+      <input type="text" id="filterNama" placeholder="Cari Nama..." onkeyup="renderData()">
+      <select id="filterPacking" onchange="renderData()">
+        <option value="">Semua Status Packing</option>
+        <option value="Menunggu">Menunggu</option>
+        <option value="Sudah di Packing">Sudah di Packing</option>
+        <option value="Belum Lengkap">Belum Lengkap</option>
+      </select>
+      <select id="filterKirim" onchange="renderData()">
+        <option value="">Semua Status Kirim</option>
+        <option value="true">Sudah Kirim</option>
+        <option value="false">Belum Kirim</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Container List -->
+  <div class="container" id="dataContainer"></div>
+
+  <script>
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
+    
+    // ==== GANTI DENGAN URL APPS SCRIPT ANDA ====
+    const API_URL = "https://script.google.com/macros/s/AKfycbxSxXRkkVV793Ws2XivvLfdiw9u1zzsZkLPitM8hhcHmZ2ionKVYLB3HDgo3as4QKnQ9Q/exec"; 
+    
+    let localData = [];
+
+    // Fungsi Fetch Data Biasa (Auto/Background)
+    async function fetchData() {
+      try {
+        const response = await fetch(API_URL);
+        localData = await response.json();
+        renderData();
+        // Hilangkan loading setelah data selesai ditarik
+        document.getElementById('loader').style.display = 'none';
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('loader').style.display = 'none';
+      }
+    }
+
+    // Fungsi Refresh Manual (Memunculkan Loading Screen)
+    async function manualRefresh() {
+      document.getElementById('loader').style.display = 'flex';
+      await fetchData();
+    }
+
+    // Fungsi Hit API ke Google Sheets (Memunculkan Loading Screen otomatis)
+    async function sendToSheet(action, dataObj) {
+      document.getElementById('loader').style.display = 'flex'; // Munculkan Loading
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: action, data: dataObj })
+        });
+        await fetchData(); // Fetch ulang data terbaru
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Gagal menyimpan. Cek koneksi internet Anda.');
+        document.getElementById('loader').style.display = 'none';
+      }
+    }
+
+    // Action: Tombol Sudah Packing / Belum Lengkap
+    function updateStatusPacking(id, status) {
+      let item = localData.find(d => d.id === id);
+      if(item) {
+        item.status_packing = status;
+        sendToSheet('update', item);
+      }
+    }
+
+    // Action: Tombol Simpan Note
+    function simpanNote(id) {
+      const noteVal = document.getElementById(`note_${id}`).value;
+      let item = localData.find(d => d.id === id);
+      if(item) {
+        item.note = noteVal;
+        sendToSheet('update', item);
+      }
+    }
+
+    // Render HTML Data ke Layar
+    function renderData() {
+      const container = document.getElementById('dataContainer');
+      const fTgl = document.getElementById('filterTanggal').value;
+      const fNama = document.getElementById('filterNama').value.toLowerCase();
+      const fPack = document.getElementById('filterPacking').value;
+      const fKirim = document.getElementById('filterKirim').value;
+
+      let data = [...localData];
+      
+      // Filter Data
+      if(fTgl) data = data.filter(d => d.tanggal === fTgl);
+      if(fNama) data = data.filter(d => d.nama.toLowerCase().includes(fNama));
+      if(fPack) data = data.filter(d => d.status_packing === fPack);
+      if(fKirim !== "") data = data.filter(d => String(d.status_kirim) === fKirim);
+
+      // Urutkan dari yang terbaru ke yang terlama
+      data.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+
+      container.innerHTML = '';
+      data.forEach(item => {
+        let kirimClass = item.status_kirim ? 'badge-sent' : 'badge-waiting';
+        
+        container.innerHTML += `
+          <div class="card">
+            <div class="card-header">
+              <div style="flex: 1;">
+                <div class="card-title">${item.nama}</div>
+                <div class="card-date">Tanggal: ${item.tanggal}</div>
+              </div>
+              <span class="badge ${kirimClass}" style="margin-left: 10px;">Kirim: ${item.status_kirim ? 'Sudah Kirim' : 'Belum'}</span>
+            </div>
+            
+            <div class="action-buttons">
+              <button class="btn-success" style="${item.status_packing === 'Sudah di Packing' ? 'opacity:0.5' : ''}" onclick="updateStatusPacking('${item.id}', 'Sudah di Packing')">Sudah di Packing</button>
+              <button class="btn-danger" style="${item.status_packing === 'Belum Lengkap' ? 'opacity:0.5' : ''}" onclick="updateStatusPacking('${item.id}', 'Belum Lengkap')">Belum Lengkap</button>
+            </div>
+
+            <div class="note-section">
+              <input type="text" id="note_${item.id}" placeholder="Tambah Catatan Opsional..." value="${item.note}">
+              <button class="btn-outline" onclick="simpanNote('${item.id}')">Simpan</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Pertama kali load, fetch data dari server
+    fetchData();
+
+    // Auto-refresh di background setiap 15 detik (tanpa memunculkan layar loading agar tidak mengganggu ketikan)
+    setInterval(fetchData, 15000);
+  </script>
+</body>
+</html>
