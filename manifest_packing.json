@@ -1,0 +1,16 @@
+{
+  "name": "Dashboard Admin Packing",
+  "short_name": "Admin Packing",
+  "start_url": "./packing.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#d32f2f",
+  "icons": [
+    {
+      "src": "./adminpacking.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
