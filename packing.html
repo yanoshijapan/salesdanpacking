@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Packing</title>
-  <link rel="manifest" href="./manifest_packing.json">
+  <link rel="manifest" href="./manifest.json">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
 
@@ -184,8 +184,10 @@
       if(fPack) data = data.filter(d => d.status_packing === fPack);
       if(fKirim !== "") data = data.filter(d => String(d.status_kirim) === fKirim);
 
-      // Urutkan dari yang terbaru ke yang terlama
-      data.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+			data.sort((a, b) => b.id - a.id);
+			
+			
+			
 
       container.innerHTML = '';
       data.forEach(item => {
