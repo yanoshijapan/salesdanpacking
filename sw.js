@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dashops-v5'; // Naikkan versi agar HP mendeteksi update
+const CACHE_NAME = 'dashops-v6'; // Naikkan versi agar HP mendeteksi update
 
 // Daftar file yang akan disimpan di memori HP
 const ASSETS_TO_CACHE = [
