@@ -6,98 +6,316 @@
   <title>Dashboard Packing</title>
   <link rel="manifest" href="./manifest.json">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; overflow-wrap: break-word; word-wrap: break-word; }
-    body { background-color: #f8f9fa; color: #333; }
+    :root {
+      --red: #C41E1E;
+      --red-dark: #9A1515;
+      --red-tint: #FDECEC;
+      --gold: #F2B705;
+      --gold-dark: #D69E00;
+      --bg: #F5F4F0;
+      --surface: #FFFFFF;
+      --ink: #201C1C;
+      --muted: #75716C;
+      --line: #E8E5DD;
+      --green: #1E8E4F;
+      --green-tint: #E8F6EE;
+      --red-alert: #D6362B;
+      --red-alert-tint: #FDEAE8;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow-sm: 0 1px 2px rgba(32, 28, 28, 0.06);
+      --shadow-md: 0 8px 24px -8px rgba(32, 28, 28, 0.14);
+      --shadow-lg: 0 16px 40px -12px rgba(32, 28, 28, 0.22);
+    }
 
-    /* Loading Screen */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; overflow-wrap: break-word; word-wrap: break-word; -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { background: var(--bg); color: var(--ink); padding-bottom: 24px; }
+
+    h1, h2, h3, .brand-title, .card-title, button { font-family: 'Montserrat', sans-serif; }
+
+    ::selection { background: var(--gold); color: var(--ink); }
+
+    /* ===== Loading Screen ===== */
     #loader {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(255, 255, 255, 0.9); z-index: 9999;
-      display: flex; justify-content: center; align-items: center;
-      transition: opacity 0.5s ease;
+      position: fixed; inset: 0;
+      background: rgba(245, 244, 240, 0.92); backdrop-filter: blur(3px);
+      z-index: 9999;
+      display: flex; flex-direction: column; gap: 14px; justify-content: center; align-items: center;
+      transition: opacity 0.35s ease;
     }
     .spinner {
-      border: 5px solid #f3f3f3; border-top: 5px solid #d32f2f;
-      border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite;
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 4px solid var(--line); border-top-color: var(--red);
+      animation: spin 0.85s linear infinite;
     }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    #loader span { font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 0.02em; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Headers (Membeku) */
+    /* ===== Sticky Header ===== */
     .sticky-header {
       position: sticky; top: 0; z-index: 100;
-      background: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      padding: 15px 20px; border-bottom: 3px solid #ffd700;
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+      border-bottom: 1px solid var(--line);
     }
-    .header-top {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
-    }
-    /* Mengubah warna judul menjadi merah */
-    .header-title { color: #d32f2f; font-weight: 700; margin: 0; }
-    
-    .filter-group { display: flex; gap: 10px; flex-wrap: wrap; }
-    input, select, button { padding: 10px; border-radius: 6px; border: 1px solid #ccc; outline: none; }
-    input { flex: 1; min-width: 150px; }
-    button { font-weight: 600; cursor: pointer; transition: 0.3s; border: none; }
-    
-    .btn-primary { background: #d32f2f; color: white; }
-    .btn-primary:hover { background: #b71c1c; }
-    .btn-gold { background: #ffd700; color: #333; display: flex; align-items: center; gap: 6px; }
-    .btn-gold:hover { background: #fbc02d; }
-    .btn-danger { background: #e53935; color: white; }
-    .btn-success { background: #43a047; color: white; }
-    .btn-outline { background: transparent; border: 1px solid #d32f2f; color: #d32f2f; }
+    .header-inner { max-width: 1000px; margin: 0 auto; padding: 16px 18px 14px; }
 
-    /* Container & Cards */
-    .container { padding: 20px; max-width: 1000px; margin: 0 auto; }
-    .card {
-      background: white; padding: 15px; border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 15px;
-      border-left: 4px solid #ffd700;
-      display: flex; flex-direction: column; gap: 10px;
+    .header-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-mark {
+      width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+      background: linear-gradient(145deg, var(--red), var(--red-dark));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; box-shadow: 0 4px 10px -3px rgba(196, 30, 30, 0.5);
     }
-    .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
-    .card-title { font-weight: 600; font-size: 1.1em; white-space: normal; }
-    .card-date { font-size: 0.8em; color: #777; }
-    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600; display: inline-block; }
-    .badge-waiting { background: #eee; color: #555; }
-    .badge-sent { background: #c8e6c9; color: #2e7d32; }
-    
-    .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 5px; }
-    .action-buttons button { flex: 1; }
-    .note-section { display: flex; gap: 10px; margin-top: 10px; }
+    .brand-text { min-width: 0; }
+    .brand-title { color: var(--ink); font-weight: 800; font-size: 1.05em; letter-spacing: -0.01em; line-height: 1.15; }
+    .brand-sub { font-size: 0.72em; color: var(--muted); font-weight: 600; margin-top: 2px; }
+
+    .btn-refresh {
+      display: flex; align-items: center; gap: 7px; flex-shrink: 0;
+      background: var(--ink); color: white; border: none;
+      padding: 10px 14px; border-radius: 10px; font-weight: 700; font-size: 0.82em;
+      cursor: pointer; transition: transform 0.15s ease, background 0.15s ease;
+    }
+    .btn-refresh:hover { background: #3a3532; }
+    .btn-refresh:active { transform: scale(0.95); }
+    .btn-refresh svg { width: 15px; height: 15px; transition: transform 0.5s ease; }
+    .btn-refresh.spinning svg { animation: spin 0.7s linear infinite; }
+    .refresh-label { display: none; }
+    @media (min-width: 420px) { .refresh-label { display: inline; } }
+
+    /* ===== Stats strip ===== */
+    .stats-strip { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 14px; padding-bottom: 2px; scrollbar-width: none; }
+    .stats-strip::-webkit-scrollbar { display: none; }
+    .stat-chip {
+      flex-shrink: 0; display: flex; align-items: baseline; gap: 6px;
+      background: var(--bg); border: 1px solid var(--line); border-radius: 999px;
+      padding: 7px 13px; font-size: 0.76em; font-weight: 600; color: var(--muted);
+      white-space: nowrap;
+    }
+    .stat-chip b { font-family: 'Montserrat', sans-serif; font-size: 1.15em; font-weight: 800; color: var(--ink); }
+    .stat-chip.stat-total { background: var(--ink); border-color: var(--ink); color: rgba(255,255,255,0.75); }
+    .stat-chip.stat-total b { color: #fff; }
+    .stat-chip.stat-sent { background: var(--green-tint); border-color: #cdebd9; color: var(--green); }
+    .stat-chip.stat-sent b { color: var(--green); }
+    .stat-chip.stat-incomplete { background: var(--red-alert-tint); border-color: #f7cdc9; color: var(--red-alert); }
+    .stat-chip.stat-incomplete b { color: var(--red-alert); }
+    .stat-chip.stat-waiting { background: #FFF7E0; border-color: #f5e3a3; color: var(--gold-dark); }
+    .stat-chip.stat-waiting b { color: var(--gold-dark); }
+
+    /* ===== Filters ===== */
+    .filter-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+    @media (min-width: 560px) { .filter-group { grid-template-columns: 1fr 1fr 1fr 1fr; } }
+
+    .field { position: relative; }
+    .field svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--muted); pointer-events: none; }
+
+    input, select {
+      width: 100%; padding: 10px 12px; border-radius: 10px; border: 1.5px solid var(--line);
+      outline: none; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      background: var(--surface); color: var(--ink); font-size: 0.85em; font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      appearance: none; -webkit-appearance: none;
+    }
+    input[type="text"] { padding-left: 34px; }
+    input[type="date"] { padding-left: 34px; color: var(--ink); }
+    select { padding-right: 30px; }
+    .field.select-field::after {
+      content: ''; position: absolute; right: 11px; top: 50%; width: 8px; height: 8px;
+      border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted);
+      transform: translateY(-70%) rotate(45deg); pointer-events: none;
+    }
+    input:focus, select:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(196,30,30,0.1); }
+    input::placeholder { color: #A9A5A0; font-weight: 500; }
+
+    button { font-weight: 700; cursor: pointer; transition: 0.15s ease; border: none; font-family: 'Montserrat', sans-serif; }
+    .btn-primary { background: var(--red); color: white; }
+    .btn-primary:hover { background: var(--red-dark); }
+    .btn-danger { background: var(--red-alert); color: white; }
+    .btn-danger:hover { background: #b82a20; }
+    .btn-success { background: var(--green); color: white; }
+    .btn-success:hover { background: #17753f; }
+    .btn-outline { background: transparent; border: 1.5px solid var(--line); color: var(--ink); font-weight: 700; }
+    .btn-outline:hover { background: var(--bg); border-color: var(--muted); }
+
+    /* ===== Select all ===== */
+    .select-all-wrapper {
+      display: flex; align-items: center; gap: 11px;
+      background: var(--bg); border: 1px solid var(--line);
+      padding: 11px 13px; border-radius: 10px;
+    }
+    .select-all-wrapper label { font-size: 12.5px; font-weight: 700; cursor: pointer; color: var(--muted); user-select: none; }
+
+    /* ===== Custom checkbox ===== */
+    .checkbox-custom {
+      appearance: none; -webkit-appearance: none;
+      width: 21px; height: 21px; border-radius: 6px; flex-shrink: 0; margin-top: 2px;
+      border: 2px solid #CFCAC2; background: var(--surface);
+      cursor: pointer; position: relative; transition: all 0.15s ease;
+    }
+    .checkbox-custom:checked { background: var(--red); border-color: var(--red); }
+    .checkbox-custom:checked::after {
+      content: ''; position: absolute; left: 6px; top: 2px; width: 5px; height: 10px;
+      border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg);
+    }
+    .checkbox-custom:focus-visible { box-shadow: 0 0 0 3px rgba(196,30,30,0.18); }
+
+    /* ===== Bulk action bar (bottom sheet) ===== */
+    .bulk-actions-bar {
+      display: none; align-items: center; justify-content: space-between; gap: 12px;
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 200;
+      background: var(--ink); padding: 14px 18px calc(14px + env(safe-area-inset-bottom));
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.25);
+      animation: slideUp 0.25s ease;
+    }
+    .bulk-inner { max-width: 1000px; margin: 0 auto; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .bulk-count { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.9); }
+    .bulk-count b { font-family: 'Montserrat', sans-serif; font-size: 1.3em; font-weight: 800; color: var(--gold); margin-right: 5px; }
+    .bulk-btns { display: flex; gap: 8px; }
+    .bulk-actions-bar button { padding: 9px 14px; font-size: 11.5px; border-radius: 9px; letter-spacing: 0.02em; }
+    body.has-bulk-bar { padding-bottom: 78px; }
+
+    /* ===== Container & Cards ===== */
+    .container { padding: 16px; max-width: 1000px; margin: 0 auto; }
+
+    .card {
+      background: var(--surface); padding: 16px; border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm); margin-bottom: 12px;
+      border: 1px solid var(--line); border-left: 5px solid var(--gold);
+      display: flex; flex-direction: column; gap: 13px;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+    .card.bg-sent { background: var(--green-tint); border-left-color: var(--green); border-color: #cdebd9; }
+    .card.bg-incomplete { background: var(--red-alert-tint); border-left-color: var(--red-alert); border-color: #f7cdc9; }
+
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .card-header-left { display: flex; gap: 12px; align-items: flex-start; flex: 1; min-width: 0; }
+
+    .card-title { font-weight: 800; font-size: 1em; color: var(--ink); line-height: 1.3; }
+    .card-date { font-size: 0.75em; color: var(--muted); margin-top: 3px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+    .card-date svg { width: 11px; height: 11px; }
+
+    .badge { padding: 5px 10px; border-radius: 7px; font-size: 0.68em; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
+    .badge-waiting { background: #F3F1EC; color: var(--muted); }
+    .badge-sent { background: var(--green); color: #ffffff; }
+    .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.85; }
+
+    .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+    .action-buttons button {
+      flex: 1; min-width: 130px; border-radius: 10px; font-size: 0.78em; padding: 10px 8px;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .action-buttons button svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    /* Belum dipilih: tetap jelas terlihat & bisa diklik (tinted + border tegas) */
+    .action-buttons button.is-muted { background: var(--surface); }
+    .action-buttons button.btn-success.is-muted { color: var(--green); border: 2px solid var(--green); }
+    .action-buttons button.btn-success.is-muted:hover { background: var(--green-tint); }
+    .action-buttons button.btn-danger.is-muted { color: var(--red-alert); border: 2px solid var(--red-alert); }
+    .action-buttons button.btn-danger.is-muted:hover { background: var(--red-alert-tint); }
+
+    /* Sudah dipilih: solid + bayangan supaya statusnya menonjol */
+    .action-buttons button.is-active { border: 2px solid transparent; }
+    .action-buttons button.btn-success.is-active { background: var(--green); color: #fff; box-shadow: 0 5px 12px -3px rgba(30,142,79,0.5); }
+    .action-buttons button.btn-danger.is-active { background: var(--red-alert); color: #fff; box-shadow: 0 5px 12px -3px rgba(214,54,43,0.5); }
+
+    .note-section { display: flex; gap: 8px; }
+    .note-section input { font-size: 0.82em; }
+    .note-section button { padding: 10px 16px; border-radius: 10px; font-size: 0.78em; flex-shrink: 0; }
+
+    /* ===== Empty state ===== */
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: var(--muted);
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .empty-state .empty-icon {
+      width: 60px; height: 60px; border-radius: 16px; background: var(--surface);
+      border: 1.5px dashed var(--line); display: flex; align-items: center; justify-content: center;
+      font-size: 26px; margin-bottom: 4px;
+    }
+    .empty-state strong { color: var(--ink); font-family: 'Montserrat', sans-serif; font-size: 0.95em; }
+    .empty-state span { font-size: 0.82em; max-width: 260px; line-height: 1.5; }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
   </style>
 </head>
 <body>
   <!-- Loading Screen -->
-  <div id="loader"><div class="spinner"></div></div>
+  <div id="loader"><div class="spinner"></div><span>Memuat data...</span></div>
 
   <!-- Header Membeku -->
   <div class="sticky-header">
-    <div class="header-top">
-      <!-- Judul Warna Merah -->
-      <h2 class="header-title">Packing</h2>
-      <!-- Tombol Refresh di Kanan Atas -->
-      <button class="btn-gold" onclick="manualRefresh()" style="padding: 8px 15px;">
-        <span style="font-size: 1.2em; line-height: 1;">&#x21bb;</span> Refresh
-      </button>
-    </div>
+    <div class="header-inner">
+      <div class="header-top">
+        <div class="brand">
+          <div class="brand-mark">📦</div>
+          <div class="brand-text">
+            <div class="brand-title">Packing Omiyage</div>
+            <div class="brand-sub">Daftar pengiriman hari ini</div>
+          </div>
+        </div>
+        <button class="btn-refresh" id="refreshBtn" onclick="manualRefresh()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          <span class="refresh-label">Refresh</span>
+        </button>
+      </div>
 
-    <div class="filter-group">
-      <input type="date" id="filterTanggal" onchange="renderData()">
-      <input type="text" id="filterNama" placeholder="Cari Nama..." onkeyup="renderData()">
-      <select id="filterPacking" onchange="renderData()">
-        <option value="">Semua Status Packing</option>
-        <option value="Menunggu">Menunggu</option>
-        <option value="Sudah di Packing">Sudah di Packing</option>
-        <option value="Belum Lengkap">Belum Lengkap</option>
-      </select>
-      <select id="filterKirim" onchange="renderData()">
-        <option value="">Semua Status Kirim</option>
-        <option value="true">Sudah Kirim</option>
-        <option value="false">Belum Kirim</option>
-      </select>
+      <!-- Ringkasan -->
+      <div class="stats-strip" id="statsStrip"></div>
+
+      <!-- Filter Data -->
+      <div class="filter-group">
+        <div class="field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          <input type="date" id="filterTanggal" onchange="renderData()">
+        </div>
+        <div class="field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="filterNama" placeholder="Cari Nama..." onkeyup="renderData()">
+        </div>
+        <div class="field select-field">
+          <select id="filterPacking" onchange="renderData()">
+            <option value="">Semua Status Packing</option>
+            <option value="Menunggu">Menunggu</option>
+            <option value="Sudah di Packing">Sudah di Packing</option>
+            <option value="Belum Lengkap">Belum Lengkap</option>
+          </select>
+        </div>
+        <div class="field select-field">
+          <select id="filterKirim" onchange="renderData()">
+            <option value="">Semua Status Kirim</option>
+            <option value="true">Sudah Kirim</option>
+            <option value="false">Belum Kirim</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Pilih Semua Bar -->
+      <div class="select-all-wrapper">
+        <input type="checkbox" id="selectAllCb" class="checkbox-custom" onchange="toggleSelectAll(this)">
+        <label for="selectAllCb">Pilih Semua Data di Layar</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bulk Actions -->
+  <div class="bulk-actions-bar" id="bulkActionGroup">
+    <div class="bulk-inner">
+      <div class="bulk-count"><b id="selectedCount">0</b>Nama Terpilih</div>
+      <div class="bulk-btns">
+        <button class="btn-success" onclick="bulkUpdateStatusPacking('Sudah di Packing')">✔ Sudah Packing</button>
+        <button class="btn-danger" onclick="bulkUpdateStatusPacking('Belum Lengkap')">✖ Belum Lengkap</button>
+      </div>
     </div>
   </div>
 
@@ -106,24 +324,46 @@
 
   <script>
     if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
-    
+
     // ==== GANTI DENGAN URL APPS SCRIPT ANDA ====
     const API_URL = "https://script.google.com/macros/s/AKfycbxSxXRkkVV793Ws2XivvLfdiw9u1zzsZkLPitM8hhcHmZ2ionKVYLB3HDgo3as4QKnQ9Q/exec"; 
     
     let localData = [];
+    let selectedIds = new Set();
 		
-		function formatTanggal(dateStr) {
+    function formatTanggal(dateStr) {
         if (!dateStr) return '-';
         return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
     }
 
-    // Fungsi Fetch Data Biasa (Auto/Background)
+    // Jika status kirim sudah "Sudah", maka status packing wajib "Sudah di Packing".
+    // Ini menjaga2 kalau user lupa menekan tombol packing secara manual sebelum kirim.
+    async function autoCorrectStatus() {
+      const toFix = localData.filter(item => {
+        const sudahKirim = item.status_kirim === true || String(item.status_kirim) === "true";
+        return sudahKirim && item.status_packing !== 'Sudah di Packing';
+      });
+      if (toFix.length === 0) return;
+
+      toFix.forEach(item => { item.status_packing = 'Sudah di Packing'; });
+
+      try {
+        await Promise.all(toFix.map(item => fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'update', data: item })
+        })));
+      } catch (error) {
+        console.error('Auto-correct error:', error);
+      }
+    }
+
     async function fetchData() {
       try {
         const response = await fetch(API_URL);
         localData = await response.json();
+        await autoCorrectStatus();
         renderData();
-        // Hilangkan loading setelah data selesai ditarik
         document.getElementById('loader').style.display = 'none';
       } catch (error) {
         console.error('Error:', error);
@@ -131,22 +371,23 @@
       }
     }
 
-    // Fungsi Refresh Manual (Memunculkan Loading Screen)
     async function manualRefresh() {
       document.getElementById('loader').style.display = 'flex';
+      const btn = document.getElementById('refreshBtn');
+      btn.classList.add('spinning');
       await fetchData();
+      btn.classList.remove('spinning');
     }
 
-    // Fungsi Hit API ke Google Sheets (Memunculkan Loading Screen otomatis)
     async function sendToSheet(action, dataObj) {
-      document.getElementById('loader').style.display = 'flex'; // Munculkan Loading
+      document.getElementById('loader').style.display = 'flex';
       try {
         await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({ action: action, data: dataObj })
         });
-        await fetchData(); // Fetch ulang data terbaru
+        await fetchData();
       } catch (error) {
         console.error('Error:', error);
         alert('Gagal menyimpan. Cek koneksi internet Anda.');
@@ -154,7 +395,73 @@
       }
     }
 
-    // Action: Tombol Sudah Packing / Belum Lengkap
+    // ==========================================
+    // LOGIKA CHECKBOX & MULTIPLE ACTION
+    // ==========================================
+    function handleSelection(checkbox) {
+      if (checkbox.checked) selectedIds.add(checkbox.value);
+      else selectedIds.delete(checkbox.value);
+      updateBulkButtons();
+    }
+
+    function toggleSelectAll(masterCheckbox) {
+      const checkboxes = document.querySelectorAll('.item-checkbox');
+      checkboxes.forEach(cb => {
+        cb.checked = masterCheckbox.checked;
+        if (masterCheckbox.checked) selectedIds.add(cb.value);
+        else selectedIds.delete(cb.value);
+      });
+      updateBulkButtons();
+    }
+
+    function updateBulkButtons() {
+      const btnBulk = document.getElementById('bulkActionGroup');
+      const countSpan = document.getElementById('selectedCount');
+      if (selectedIds.size > 0) {
+        btnBulk.style.display = 'flex';
+        countSpan.textContent = selectedIds.size;
+        document.body.classList.add('has-bulk-bar');
+      } else {
+        btnBulk.style.display = 'none';
+        document.body.classList.remove('has-bulk-bar');
+      }
+    }
+
+    async function bulkUpdateStatusPacking(status) {
+      if (selectedIds.size === 0) return;
+      if (!confirm(`Anda akan mengubah status packing ${selectedIds.size} nama menjadi "${status}". Lanjutkan?`)) return;
+
+      document.getElementById('loader').style.display = 'flex';
+
+      const updatePromises = [];
+      let updatedData = [...localData];
+
+      for (let id of selectedIds) {
+        let idx = updatedData.findIndex(d => d.id === id);
+        if (idx !== -1) {
+          updatedData[idx].status_packing = status;
+          let promise = fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ action: 'update', data: updatedData[idx] })
+          });
+          updatePromises.push(promise);
+        }
+      }
+
+      try {
+        await Promise.all(updatePromises);
+        selectedIds.clear();
+        document.getElementById('selectAllCb').checked = false;
+        await fetchData();
+      } catch (error) {
+        console.error('Bulk update error:', error);
+        alert('Beberapa data mungkin gagal diperbarui. Cek koneksi Anda.');
+        document.getElementById('loader').style.display = 'none';
+      }
+      updateBulkButtons();
+    }
+
     function updateStatusPacking(id, status) {
       let item = localData.find(d => d.id === id);
       if(item) {
@@ -163,7 +470,6 @@
       }
     }
 
-    // Action: Tombol Simpan Note
     function simpanNote(id) {
       const noteVal = document.getElementById(`note_${id}`).value;
       let item = localData.find(d => d.id === id);
@@ -173,7 +479,20 @@
       }
     }
 
-    // Render HTML Data ke Layar
+    function renderStats(data) {
+      const strip = document.getElementById('statsStrip');
+      const total = data.length;
+      const sent = data.filter(d => d.status_kirim === true || String(d.status_kirim) === "true").length;
+      const incomplete = data.filter(d => d.status_packing === 'Belum Lengkap').length;
+      const waiting = data.filter(d => !d.status_packing || d.status_packing === 'Menunggu').length;
+      strip.innerHTML = `
+        <div class="stat-chip stat-total"><b>${total}</b> Total</div>
+        <div class="stat-chip stat-sent"><b>${sent}</b> Sudah Kirim</div>
+        <div class="stat-chip stat-waiting"><b>${waiting}</b> Menunggu</div>
+        <div class="stat-chip stat-incomplete"><b>${incomplete}</b> Belum Lengkap</div>
+      `;
+    }
+
     function renderData() {
       const container = document.getElementById('dataContainer');
       const fTgl = document.getElementById('filterTanggal').value;
@@ -181,9 +500,11 @@
       const fPack = document.getElementById('filterPacking').value;
       const fKirim = document.getElementById('filterKirim').value;
 
+      const selectAllCb = document.getElementById('selectAllCb');
+      if(selectAllCb) selectAllCb.checked = false;
+
       let data = [...localData];
       
-      // Filter Data
       if(fTgl) {
           data = data.filter(d => {
               let dDate = new Date(d.tanggal);
@@ -195,44 +516,76 @@
       if(fPack) data = data.filter(d => d.status_packing === fPack);
       if(fKirim !== "") data = data.filter(d => String(d.status_kirim) === fKirim);
 
-			data.sort((a, b) => b.id - a.id);
-			
-			
-			
+      data.sort((a, b) => b.id - a.id);
+
+      renderStats(data);
+
+      if (data.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <strong>Tidak ada data ditemukan</strong>
+            <span>Coba ubah filter tanggal, nama, atau status di atas untuk melihat data lainnya.</span>
+          </div>
+        `;
+        updateBulkButtons();
+        return;
+      }
 
       container.innerHTML = '';
       data.forEach(item => {
         let kirimClass = item.status_kirim ? 'badge-sent' : 'badge-waiting';
         
+        let cardColorClass = '';
+        if (item.status_kirim === true || String(item.status_kirim) === "true") {
+            cardColorClass = 'bg-sent'; 
+        } else if (item.status_packing === 'Belum Lengkap') {
+            cardColorClass = 'bg-incomplete'; 
+        }
+
+        let isChecked = selectedIds.has(item.id) ? 'checked' : '';
+        let sudahActive = item.status_packing === 'Sudah di Packing';
+        let belumActive = item.status_packing === 'Belum Lengkap';
+        
         container.innerHTML += `
-          <div class="card">
+          <div class="card ${cardColorClass}">
             <div class="card-header">
-              <div style="flex: 1;">
-                <div class="card-title">${item.nama}</div>
-                <!-- UBAH TAMPILAN TANGGAL DI SINI -->
-                <div class="card-date">Tanggal: ${formatTanggal(item.tanggal)}</div> 
+              <div class="card-header-left">
+                <input type="checkbox" class="item-checkbox checkbox-custom" value="${item.id}" onchange="handleSelection(this)" ${isChecked}>
+                <div>
+                  <div class="card-title">${item.nama}</div>
+                  <div class="card-date">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    ${formatTanggal(item.tanggal)}
+                  </div>
+                </div>
               </div>
-              <span class="badge ${kirimClass}" style="margin-left: 10px;">Kirim: ${item.status_kirim ? 'Sudah Kirim' : 'Belum'}</span>
+              <span class="badge ${kirimClass}">${item.status_kirim ? 'Sudah Kirim' : 'Belum Kirim'}</span>
             </div>
             
             <div class="action-buttons">
-              <button class="btn-success" style="${item.status_packing === 'Sudah di Packing' ? 'opacity:0.5' : ''}" onclick="updateStatusPacking('${item.id}', 'Sudah di Packing')">Sudah di Packing</button>
-              <button class="btn-danger" style="${item.status_packing === 'Belum Lengkap' ? 'opacity:0.5' : ''}" onclick="updateStatusPacking('${item.id}', 'Belum Lengkap')">Belum Lengkap</button>
+              <button class="btn-success ${sudahActive ? 'is-active' : 'is-muted'}" onclick="updateStatusPacking('${item.id}', 'Sudah di Packing')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Sudah di Packing
+              </button>
+              <button class="btn-danger ${belumActive ? 'is-active' : 'is-muted'}" onclick="updateStatusPacking('${item.id}', 'Belum Lengkap')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                Belum Lengkap
+              </button>
             </div>
 
             <div class="note-section">
-              <input type="text" id="note_${item.id}" placeholder="Tambah Catatan Opsional..." value="${item.note}">
+              <input type="text" id="note_${item.id}" placeholder="Tambah Catatan Opsional..." value="${item.note || ''}">
               <button class="btn-outline" onclick="simpanNote('${item.id}')">Simpan</button>
             </div>
           </div>
         `;
       });
+
+      updateBulkButtons(); 
     }
 
-    // Pertama kali load, fetch data dari server
     fetchData();
-
-    // Auto-refresh di background setiap 15 detik (tanpa memunculkan layar loading agar tidak mengganggu ketikan)
     setInterval(fetchData, 15000);
   </script>
 </body>
